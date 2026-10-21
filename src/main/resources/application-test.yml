@@ -1,0 +1,16 @@
+spring:
+  application:
+    version: 1.0.0-test
+
+server:
+  port: 8081
+
+
+bank:
+  name: API TEST
+  country: Cambodia
+  currency: USD
+  maxDeposit: 100000.0
+  minDeposit: 0.0
+  maxWithdraw: 100000.0
+  minWithdraw: 0.0

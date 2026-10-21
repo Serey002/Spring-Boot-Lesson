@@ -1,0 +1,15 @@
+spring:
+  application:
+    version: 1.0.0-prod
+
+server:
+  port: 8082
+
+bank:
+  name: API PROD
+  country: Cambodia
+  currency: USD
+  maxDeposit: 100000.0
+  minDeposit: 0.0
+  maxWithdraw: 100000.0
+  minWithdraw: 0.0
