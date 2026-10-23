@@ -116,6 +116,7 @@ class AccountController(
     @PostMapping("/account/{id}/withdraw")
     fun withdraw(
         @PathVariable id: Long,
+        @Valid
         @RequestBody withdrawRequest: WithdrawRequest):
         ResponseEntity<AccountRespond<Account>> {
         val updateAccountBalance = accountService.withdraw(
