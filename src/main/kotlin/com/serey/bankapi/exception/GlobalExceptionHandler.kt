@@ -1,6 +1,7 @@
 package com.serey.bankapi.exception
 
 import com.serey.bankapi.dto.responses.AccountRespond
+import com.serey.bankapi.dto.responses.ErrorRespond
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -43,9 +44,9 @@ class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientBalanceException::class)
     fun handleInsufficientBalanceException(
         exception: InsufficientBalanceException
-    ): ResponseEntity<AccountRespond<Nothing>> {
+    ): ResponseEntity<ErrorRespond> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            AccountRespond(
+            ErrorRespond(
                 success = false,
                 message = exception.message ?: "Insufficient balance"
             )
@@ -55,11 +56,23 @@ class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(
         exception: IllegalArgumentException
-    ): ResponseEntity<AccountRespond<Nothing>> {
+    ): ResponseEntity<ErrorRespond> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            AccountRespond(
+            ErrorRespond(
                 success = false,
                 message = exception.message ?: "Invalid input"
+            )
+        )
+    }
+
+    @ExceptionHandler(DuplicateEmailException::class)
+    fun handleDuplicateEmailException(
+        exception: DuplicateEmailException
+    ): ResponseEntity<ErrorRespond>{
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+            ErrorRespond(
+                success = false,
+                message = exception.message ?: "Duplicate email"
             )
         )
     }

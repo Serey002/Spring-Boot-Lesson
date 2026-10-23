@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -46,7 +45,6 @@ class AccountController(
             //filter
             val filterAccountStatus = request.accountStatus.isNullOrBlank() ||
                                       account.status.name.equals(request.accountStatus,  true)
-
             matchAccountName && filterAccountStatus
         }
 
@@ -78,16 +76,15 @@ class AccountController(
         val account = Account(
             id = newId,
             accountNumber = newAccountNumber,
-            accountName = account.accountName,
-            balance = account.balance,
-            status = AccountStatus.ACTIVE
+            accountName = account.accountName ?: throw IllegalArgumentException("Account name is required"),
+            balance = account.balance ?: 0.0,
+            status = AccountStatus.ACTIVE,
+            email = account.email ?: throw IllegalArgumentException("Email is required")
         )
         val newAccount = accountService.createAccount(account)
-        return ResponseEntity.status(HttpStatus.CREATED).body(AccountRespond(
-            success = true,
-            message = "Account created successfully",
-            data = newAccount
-        ))
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            newAccount
+        )
     }
 
     @PutMapping("account/update/{id}")
@@ -107,9 +104,12 @@ class AccountController(
     @PostMapping("/account/{id}/deposit")
     fun deposit(
         @PathVariable id: Long,
+        @Valid
         @RequestBody depositRequest: DepositRequest):
         ResponseEntity<AccountRespond<Account>> {
-        val updateAccountBalance = accountService.deposit(id, depositRequest.amount )
+        val updateAccountBalance = accountService.deposit(
+            id = id,
+            amount = depositRequest.amount ?: throw IllegalArgumentException("Deposit amount is required") )
         return  ResponseEntity.status(HttpStatus.OK).body(updateAccountBalance)
     }
 
@@ -118,10 +118,9 @@ class AccountController(
         @PathVariable id: Long,
         @RequestBody withdrawRequest: WithdrawRequest):
         ResponseEntity<AccountRespond<Account>> {
-        val updateAccountBalance = accountService.withdraw(id, withdrawRequest.amount )
+        val updateAccountBalance = accountService.withdraw(
+            id = id,
+            amount = withdrawRequest.amount ?: throw IllegalArgumentException("Withdraw amount is required") )
         return ResponseEntity.status(HttpStatus.OK).body(updateAccountBalance)
     }
-
-
-
 }

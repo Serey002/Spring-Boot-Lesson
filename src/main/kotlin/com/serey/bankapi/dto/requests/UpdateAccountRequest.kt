@@ -5,5 +5,6 @@ import com.serey.bankapi.enums.AccountStatus
 data class UpdateAccountRequest(
     val accountName: String?,
     val balance: Double?,
-    val status: AccountStatus?
+    val status: AccountStatus?,
+    val email: String?,
 )

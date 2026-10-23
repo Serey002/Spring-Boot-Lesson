@@ -7,6 +7,7 @@ data class Account(
     val accountNumber: String,
     val accountName: String,
     val balance: Double,
-    val status: AccountStatus = AccountStatus.ACTIVE
+    val status: AccountStatus = AccountStatus.ACTIVE,
+    val email: String,
 )
 

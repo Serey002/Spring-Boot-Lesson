@@ -5,6 +5,7 @@ import com.serey.bankapi.dto.requests.UpdateAccountRequest
 import com.serey.bankapi.dto.responses.AccountRespond
 import com.serey.bankapi.enums.AccountStatus
 import com.serey.bankapi.exception.AccountNotFoundException
+import com.serey.bankapi.exception.DuplicateEmailException
 import com.serey.bankapi.exception.InsufficientBalanceException
 import com.serey.bankapi.models.Account
 import com.serey.bankapi.repositories.AccountRepository
@@ -31,8 +32,18 @@ class AccountService(
         )
     }
 
-    fun createAccount(account: Account): Account {
-        return accountRepository.save(account)
+    fun createAccount(account: Account): AccountRespond<Account> {
+        if (accountRepository.existsByEmail(account.email)) {
+            throw DuplicateEmailException(
+                "Email ${account.email} already exists"
+            )
+        }
+        accountRepository.save(account)
+        return AccountRespond(
+            success = true,
+            message = "Account created successful",
+            data = account
+        )
     }
 
     fun updateAccount(id: Long, account: UpdateAccountRequest): AccountRespond<Account?> {
@@ -43,12 +54,13 @@ class AccountService(
             id = existingAccount.id,
             accountName = account.accountName?: existingAccount.accountName,
             balance = account.balance ?: existingAccount.balance,
-            status = account.status ?: existingAccount.status
+            status = account.status ?: existingAccount.status,
+            email = account.email?: existingAccount.email,
         )
         accountRepository.save(updatedAccount)
         return AccountRespond(
             success = true,
-            message = "Account updated",
+            message = "Account updated successful",
             data = updatedAccount
         )
     }
@@ -83,13 +95,13 @@ class AccountService(
                 message = "Account must be ACTIVE"
             )
 
-            amount <= bankInfo.minDeposit -> throw IllegalArgumentException(
-                "Amount must be great than ${bankInfo.minDeposit} ${bankInfo.currency}"
-            )
-
-            amount > bankInfo.maxDeposit -> throw IllegalArgumentException(
-                "Account cannot deposit over ${bankInfo.maxDeposit} ${bankInfo.currency}"
-            )
+//            amount <= bankInfo.minDeposit -> throw IllegalArgumentException(
+//                "Amount must be great than ${bankInfo.minDeposit} ${bankInfo.currency}"
+//            )
+//
+//            amount > bankInfo.maxDeposit -> throw IllegalArgumentException(
+//                "Account cannot deposit over ${bankInfo.maxDeposit} ${bankInfo.currency}"
+//            )
 
             else -> { val updateAccount = accountRepository.save(existAccount.copy(
                 balance = existAccount.balance + amount
